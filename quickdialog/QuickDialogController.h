@@ -40,9 +40,11 @@
 @property(nonatomic) BOOL resizeWhenKeyboardPresented;
 
 
+#pragma GCC diagnostic push 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 @property(nonatomic, strong) UIPopoverController *popoverBeingPresented;
 @property(nonatomic, strong) UIPopoverController *popoverForChildRoot;
-
+#pragma GCC diagnostic pop
 
 - (void)loadView;
 
