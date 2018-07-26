@@ -1,0 +1,18 @@
+//
+//  QuickDialogFramework.pch
+//  QuickDialogFramework
+//
+//  Created by Bruno Virlet on 7/26/18.
+//
+
+#ifndef QuickDialogFramework_pch
+#define QuickDialogFramework_pch
+
+#ifdef __OBJC__
+
+#import <UIKit/UIKit.h>
+
+#endif
+
+
+#endif /* QuickDialogFramework_pch */
