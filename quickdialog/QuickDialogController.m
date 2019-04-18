@@ -93,7 +93,7 @@
 }
 
 - (QuickDialogController *)initWithRoot:(QRootElement *)rootElement {
-    self = [super init];
+    self = [super initWithNibName:nil bundle:nil];
     if (self) {
         self.root = rootElement;
         self.resizeWhenKeyboardPresented =YES;
