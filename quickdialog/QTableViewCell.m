@@ -32,8 +32,11 @@ static const int kCellMinimumLabelWidth = 80;
 {
     [super layoutSubviews];
 
-    [self layoutSubviewsInsideBounds:self.contentView.bounds];
+    if (self.detailTextLabel.effectiveUserInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft && self.detailTextLabel.textAlignment == NSTextAlignmentRight) {
+        self.detailTextLabel.textAlignment = NSTextAlignmentLeft;
+    }
 
+    [self layoutSubviewsInsideBounds:self.contentView.bounds];
 }
 
 - (void)layoutSubviewsInsideBounds:(CGRect)bounds
@@ -56,16 +59,16 @@ static const int kCellMinimumLabelWidth = 80;
         }
 
         self.textLabel.frame = CGRectMake(
-                self.textLabel.frame.origin.x,
-                QCellMargin,
-                bounds.size.width - valueSize.width - QCellMarginDouble - QCellMarginDouble,
-                bounds.size.height- QCellMarginDouble);
+                                          self.textLabel.frame.origin.x,
+                                          QCellMargin,
+                                          bounds.size.width - valueSize.width - QCellMarginDouble - QCellMarginDouble,
+                                          bounds.size.height- QCellMarginDouble);
 
         self.detailTextLabel.frame = CGRectMake(
-                bounds.size.width - valueSize.width - QCellMargin,
-                QCellMargin,
-                valueSize.width,
-                bounds.size.height- QCellMarginDouble);
+                                                bounds.size.width - valueSize.width - QCellMargin,
+                                                QCellMargin,
+                                                valueSize.width,
+                                                bounds.size.height- QCellMarginDouble);
     } else {
 
         if (self.detailTextLabel.text!=nil){
@@ -80,23 +83,30 @@ static const int kCellMinimumLabelWidth = 80;
         }
 
         self.textLabel.frame = CGRectMake(
-                self.textLabel.frame.origin.x,
-                QCellMargin,
-                valueSize.width,
-                bounds.size.height- QCellMarginDouble);
+                                          self.textLabel.frame.origin.x,
+                                          QCellMargin,
+                                          valueSize.width,
+                                          bounds.size.height- QCellMarginDouble);
 
         CGFloat detailsWidth = bounds.size.width - QCellMarginDouble;
         if (valueSize.width>0)
             detailsWidth = detailsWidth - valueSize.width - QCellMarginDouble;
 
         self.detailTextLabel.frame = CGRectMake(
-                bounds.size.width - detailsWidth ,
-                QCellMargin,
-                detailsWidth - (self.accessoryView ==nil ? 0 : QCellMarginDouble) - (self.accessoryType !=UITableViewCellAccessoryNone ? 0 : QCellMarginDouble),
-                bounds.size.height- QCellMarginDouble);
+                                                bounds.size.width - detailsWidth ,
+                                                QCellMargin,
+                                                detailsWidth - (self.accessoryView ==nil ? 0 : QCellMarginDouble) - (self.accessoryType !=UITableViewCellAccessoryNone ? 0 : QCellMarginDouble),
+                                                bounds.size.height- QCellMarginDouble);
+    }
+
+    if (self.effectiveUserInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
+        self.detailTextLabel.frame = CGRectMake(
+                                                CGRectGetMinX(self.textLabel.frame) - self.detailTextLabel.frame.size.width - QCellMarginDouble,
+                                                self.detailTextLabel.frame.origin.y,
+                                                self.detailTextLabel.frame.size.width,
+                                                self.detailTextLabel.frame.size.height);
     }
 }
-
 
 - (void)applyAppearanceForElement:(QElement *)element {
     QAppearance *appearance = element.appearance;
@@ -114,6 +124,6 @@ static const int kCellMinimumLabelWidth = 80;
 
     self.backgroundColor = element.enabled ? appearance.backgroundColorEnabled : appearance.backgroundColorDisabled;
     self.selectedBackgroundView = element.appearance.selectedBackgroundView;
-
 }
+
 @end

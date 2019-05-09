@@ -1,13 +1,13 @@
-//                                
+//
 // Copyright 2011 ESCOZ Inc  - http://escoz.com
-// 
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this 
-// file except in compliance with the License. You may obtain a copy of the License at 
-// 
-// http://www.apache.org/licenses/LICENSE-2.0 
-// 
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+// file except in compliance with the License. You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
 // Unless required by applicable law or agreed to in writing, software distributed under
-// the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF 
+// the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 // ANY KIND, either express or implied. See the License for the specific language governing
 // permissions and limitations under the License.
 //
@@ -41,7 +41,7 @@
     UIBarButtonItem *flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     [actionBar setItems:[NSArray arrayWithObjects:prevNextWrapper, flexible, doneButton, nil]];
 
-	return actionBar;
+    return actionBar;
 }
 
 - (void)createSubviews {
@@ -93,7 +93,7 @@
     if (CGRectEqualToRect(CGRectZero, _entryElement.parentSection.entryPosition)) {
         for (QElement *el in _entryElement.parentSection.elements){
             if ([el isKindOfClass:[QEntryElement class]]){
-                QEntryElement *q = (QEntryElement*)el; 
+                QEntryElement *q = (QEntryElement*)el;
                 CGFloat imageWidth = q.image == NULL ? 0 : self.imageView.frame.size.width;
                 CGFloat fontSize = self.textLabel.font.pointSize == 0? 17 : self.textLabel.font.pointSize;
                 CGSize size = [((QEntryElement *)el).title sizeWithFont:[self.textLabel.font fontWithSize:fontSize] forWidth:CGFLOAT_MAX lineBreakMode:NSLineBreakByWordWrapping] ;
@@ -103,9 +103,9 @@
             }
         }
         int inset = 0;
-		if ([self respondsToSelector:@selector(separatorInset)]) {
-			inset = self.separatorInset.left;
-		};
+        if ([self respondsToSelector:@selector(separatorInset)]) {
+            inset = self.separatorInset.left;
+        };
         _entryElement.parentSection.entryPosition = CGRectMake(titleWidth+20,10,totalWidth-titleWidth-_entryElement.appearance.cellBorderWidth-extra-inset, self.frame.size.height-20);
     }
 
@@ -121,6 +121,7 @@
     [self applyAppearanceForElement:element];
 
     self.textLabel.text = element.title;
+    self.textLabel.textAlignment = NSTextAlignmentNatural;
     self.labelingPolicy = element.labelingPolicy;
 
     _quickformTableView = tableView;
@@ -140,7 +141,7 @@
     _textField.secureTextEntry = _entryElement.secureTextEntry;
     _textField.clearsOnBeginEditing = _entryElement.clearsOnBeginEditing;
     _textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-    _textField.textAlignment = _entryElement.appearance.entryAlignment;
+    _textField.textAlignment = NSTextAlignmentNatural;
 
     // workaround for UITextField bug: if the user is using a bigger system font, a long text won't scroll
     _textField.adjustsFontSizeToFitWidth = YES;
@@ -159,7 +160,7 @@
         toolbar.translucent = element.appearance.toolbarTranslucent;
         _textField.inputAccessoryView = toolbar;
     }
-    
+
 
     [self updatePrevNextStatus];
 
@@ -173,12 +174,34 @@
 
 -(void)recalculateEntryFieldPosition {
     _entryElement.parentSection.entryPosition = CGRectZero;
-    CGRect textFieldFrame = [self calculateFrameForEntryElement];
+    CGRect textFieldFrameLeftToRight = [self calculateFrameForEntryElement];
+    CGRect textFieldFrame;
     CGRect labelFrame = self.textLabel.frame;
-    self.textLabel.frame = CGRectMake(labelFrame.origin.x, labelFrame.origin.y,
-            textFieldFrame.origin.x  - labelFrame.origin.x, labelFrame.size.height);
-    _textField.frame = CGRectMake(textFieldFrame.origin.x, textFieldFrame.origin.y, self.contentView.bounds.size.width - textFieldFrame.origin.x - 20, textFieldFrame.size.height);
-    
+
+    if (self.effectiveUserInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionLeftToRight) {
+        textFieldFrame = textFieldFrameLeftToRight;
+        self.textLabel.frame = CGRectMake(
+                                          labelFrame.origin.x,
+                                          labelFrame.origin.y,
+                                          textFieldFrame.origin.x  - labelFrame.origin.x,
+                                          labelFrame.size.height);
+        _textField.frame = CGRectMake(
+                                      textFieldFrame.origin.x,
+                                      textFieldFrame.origin.y,
+                                      self.contentView.bounds.size.width - textFieldFrame.origin.x - 20,
+                                      textFieldFrame.size.height);
+    } else {
+        textFieldFrame = CGRectMake(CGRectGetMinX(self.contentView.bounds) + 10, CGRectGetMinY(textFieldFrameLeftToRight),
+                                    CGRectGetWidth(textFieldFrameLeftToRight), CGRectGetHeight(textFieldFrameLeftToRight));
+
+        self.textLabel.frame = CGRectMake(
+                                          CGRectGetMaxX(textFieldFrame),
+                                          labelFrame.origin.y,
+                                          CGRectGetMaxX(self.contentView.bounds) - CGRectGetMaxX(textFieldFrame) - 20,
+                                          labelFrame.size.height);
+        _textField.frame = textFieldFrame;
+
+    }
 }
 
 - (void)prepareForReuse {
@@ -187,8 +210,8 @@
 }
 
 - (void)textFieldEditingChanged:(UITextField *)textFieldEditingChanged {
-   _entryElement.textValue = _textField.text;
-    
+    _entryElement.textValue = _textField.text;
+
     [_entryElement handleEditingChanged:self];
 }
 
@@ -211,23 +234,23 @@
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
     _entryElement.textValue = _textField.text;
-    
+
     if(_entryElement && _entryElement.delegate && [_entryElement.delegate respondsToSelector:@selector(QEntryDidEndEditingElement:andCell:)]){
         [_entryElement.delegate QEntryDidEndEditingElement:_entryElement andCell:self];
     }
-    
+
     [_entryElement performSelector:@selector(fieldDidEndEditing)];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-    
+
     NSUInteger newLength = [textField.text length] + [string length] - range.length;
     if (newLength > [textField.text length]) {
         if (0 != _entryElement.maxLength && textField.text.length >= _entryElement.maxLength) {
             return NO;
         }
     }
-    
+
     if(_entryElement && _entryElement.delegate && [_entryElement.delegate respondsToSelector:@selector(QEntryShouldChangeCharactersInRange:withString:forElement:andCell:)]){
         return [_entryElement.delegate QEntryShouldChangeCharactersInRange:range withString:string forElement:_entryElement andCell:self];
     }
@@ -245,31 +268,31 @@
     }  else {
         [_textField resignFirstResponder];
     }
-    
+
     if(_entryElement && _entryElement.delegate && [_entryElement.delegate respondsToSelector:@selector(QEntryShouldReturnForElement:andCell:)]){
         return [_entryElement.delegate QEntryShouldReturnForElement:_entryElement andCell:self];
     }
-    
+
     return YES;
 }
 
 - (void)handleActionBarPreviousNext:(UISegmentedControl *)control {
 
-	QEntryElement *element;
+    QEntryElement *element;
 
     const BOOL isNext = control.selectedSegmentIndex == 1;
     if (isNext) {
-		element = [_entryElement.parentSection.rootElement findElementToFocusOnAfter:_entryElement];
-	} else {
-		element = [_entryElement.parentSection.rootElement findElementToFocusOnBefore:_entryElement];
-	}
+        element = [_entryElement.parentSection.rootElement findElementToFocusOnAfter:_entryElement];
+    } else {
+        element = [_entryElement.parentSection.rootElement findElementToFocusOnBefore:_entryElement];
+    }
 
-	if (element != nil) {
+    if (element != nil) {
 
         UITableViewCell *cell = [_quickformTableView cellForElement:element];
-		if (cell != nil) {
-			[cell becomeFirstResponder];
-		}
+        if (cell != nil) {
+            [cell becomeFirstResponder];
+        }
         else {
 
             [_quickformTableView scrollToRowAtIndexPath:[element getIndexPath]
@@ -284,8 +307,8 @@
                 }
             });
         }
-	}
-    
+    }
+
     if (_entryElement.keepSelected) {
         [_quickformTableView deselectRowAtIndexPath:[_entryElement getIndexPath] animated:YES];
     }
@@ -308,11 +331,11 @@
 
 - (BOOL)becomeFirstResponder {
     [_textField becomeFirstResponder];
-     return YES;
+    return YES;
 }
 
 - (BOOL)resignFirstResponder {
-	return YES;
+    return YES;
 }
 
 
