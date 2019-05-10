@@ -141,7 +141,7 @@
     _textField.secureTextEntry = _entryElement.secureTextEntry;
     _textField.clearsOnBeginEditing = _entryElement.clearsOnBeginEditing;
     _textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-    _textField.textAlignment = NSTextAlignmentNatural;
+    _textField.textAlignment = _entryElement.appearance.entryAlignment;
 
     // workaround for UITextField bug: if the user is using a bigger system font, a long text won't scroll
     _textField.adjustsFontSizeToFitWidth = YES;
