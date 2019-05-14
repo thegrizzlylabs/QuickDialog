@@ -104,7 +104,7 @@
 - (QSection *)initWithTitle:(NSString *)sectionTitle {
     self = [super init];
     if (self) {
-        self.title = sectionTitle;
+        self.title = [sectionTitle uppercaseString];
     }
     return self;
 }

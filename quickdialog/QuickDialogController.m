@@ -117,6 +117,7 @@
     _viewOnScreen = YES;
     [self.quickDialogTableView deselectRows];
     [super viewWillAppear:animated];
+
     if (_root!=nil) {
         self.title = _root.title;
         self.navigationItem.title = _root.title;
