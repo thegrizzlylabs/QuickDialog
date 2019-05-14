@@ -8,6 +8,8 @@
 
 #import "QuickDialog.h"
 
+#import "QRadioElement.h"
+
 @interface QColorPickerElement : QRadioElement
 
 
